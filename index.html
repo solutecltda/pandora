@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <title>Toma de Inventarios</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="js/libs/twitter-bootstrap/js/bootstrap.js" type="text/javascript"></script>
+    <link href="js/libs/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" type="text/css"/>
+    
+  
+    <style>
+		body {
+		  padding-top: 10px;
+		  background-color: #F5F5F5;
+		}
+	.nav > li {
+		float:none;
+		display:inline-block;
+		*display:inline; /* Internet Explorer 7 compatibility */
+		*zoom:1;
+		vertical-align: top;
+	}
+
+    </style>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="../../assets/js/html5shiv.js"></script>
+      <script src="../../assets/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body ng-app="sampleApp">
+
+    <div class="container" ng-controller="principal">
+        <div class="row">
+                
+            <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle" type="button" id="menu1" data-toggle="dropdown">Menu
+              <span class="caret"></span></button>
+              <ul class="dropdown-menu" role="menu" aria-labelledby="menu1">
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#conteo">Toma</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#listado">Listado</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#configuracion">Configuracion</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="#transmitir">Transmitir</a></li>
+                <li role="presentation"><a role="menuitem" tabindex="-1" href="" ng-click="cerrarSesion()">Salir</a></li>
+              </ul>
+            </div>
+                
+            <div class="col-xd-6">
+                    <div ng-view></div>
+            </div>
+
+        </div>
+
+    </div><!-- /.container -->
+
+
+	<script type="text/ng-template" id="barrido.html" ng-init="cantidad=0">
+            <div>
+                <form role="form" ng-submit="procesarItem()">
+                    <input class="form-control col-xd-2" type="text" name="codigo" id="codigo" ng-model="codigo" placeholder="ingrese el codigo o Ean" autofocus>                        
+                </form>
+                <h3>{{numRecs}}</h3>
+                
+            </div>
+
+	</script>
+        <script type="text/ng-template" id="conteo.html">
+            <div>
+                <form role="form" ng-submit="procesarItem()" onload="document.getElementById('codigo').focus()">
+                    <label for="codigo">Ean</label>
+                    <input class="form-control col-xd-2" type="text" name="codigo" 
+                            id="codigo" 
+                            ng-model="codigo" 
+                            placeholder="ingrese el codigo o Ean" 
+                            onkeydown="if(event.keyCode==13){document.getElementById('cantidad').focus();return false;}">
+                    <label for="Cantidad">Cantidad</label>
+                    <input class="form-control col-xd-2" type="text" name="cantidad" 
+                            id="cantidad" 
+                            ng-model="cantidad" 
+                            placeholder="cantidad"
+                            onkeydown="if(event.keyCode==13){document.getElementById('codigo').focus();}">
+                    <br>
+                    <input type="submit" value="Grabar">
+                </form>
+                <h3>{{numRecs}}</h3>
+                
+            </div>
+
+	</script>
+
+	<script type="text/ng-template" id="listado.html">
+            <div ng-init="mostrarInicio()">
+                <h4>{{message}}</h4>
+            </div>
+            <table class="table-striped table-bordered align-center" ng-init="setPagina(0,registrosPorPagina)">
+                <col width="50">
+                <col width="150">
+                <col width="20">
+
+                <tr ng-repeat="x in items">
+                    <td >{{$index}}</td><td>{{x.ean}}</td><td >{{x.cantidad}}</td>
+                </tr>
+            </table>
+    
+            <nav ng-init="contarItems()">
+                <ul class="pagination col-xd-4 ">
+                    <li ng-repeat="pag in [] | range:paginas">
+                        <a href ng-click="setPagina(pag * registrosPorPagina,registrosPorPagina)">{{ pag+1 }}</a>
+                    </li>        
+                </ul>
+
+            </nav>
+	</script>
+
+        <script type="text/ng-template" id="configuracion.html">
+
+            <div>
+              <span></span>
+              <form class="form-vertical" ng-submit="configurarInv()" ng-init="">
+                <label for="gondola">Gondola:</label>
+                    <input class="form-control col-xd-2" ng-model="gondola" type="text" name="gondola" placeholder="gondola" />
+                <label for="cara">Cara:</label>
+                    <input class="form-control col-xd-2" ng-model="cara" type="text" name="cara" placeholder="cara" />
+                <label for="tipoinv">Tipo Inventario:</label>
+                    <select class="form-control col-xd-2" name="tipoinv" ng-model="tipoinv" placeholder="Barrido o Conteo">
+                        <option value="1">Barrido</option>
+                        <option value="2">Conteo</option>
+                    </select>
+                <br>
+                <input class="button btn-info" type="submit" value="Cambiar" />
+              </form>  
+            </div>
+
+
+	</script>
+
+	<script type="text/ng-template" id="autenticacion.html">
+        
+            <form name="loginForm" ng-submit="login()" novalidate>
+              <label for="username">Usuario:</label>
+              <input class="form-control col-xd-2" type="text" id="usuario"
+                     ng-model="usuario">
+              <label for="password">Password:</label>
+              <input class="form-control col-xd-2" type="password" id="password"
+                     ng-model="clave">
+              <button class="button btn-info" type="submit">Login</button>
+            </form>        
+        
+	</script>
+        
+        <script type="text/ng-template" id="transmitir.html">
+            <h4> Esta opcion guarda las tablas de conteo en el inventario del sistema... </h4>
+            <input type="button" class="btn btn-info btn-lg" value="Transmitir" ng-click="transmitir()">
+        </script>
+        
+        
+
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.0.7/angular.min.js"></script>
+	<script src="app.js"></script>
+
+  </body>
+</html>
