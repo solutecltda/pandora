@@ -44,15 +44,15 @@ SET search_path = public, pg_catalog;
 
 CREATE FUNCTION comillas(character) RETURNS character
     LANGUAGE plpgsql
-    AS $_$
-
-declare
-  pcadena alias for $1;
-
-begin
-  return ''''||pcadena||'''';
-end;
-
+    AS $_$
+
+declare
+  pcadena alias for $1;
+
+begin
+  return ''''||pcadena||'''';
+end;
+
 $_$;
 
 

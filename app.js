@@ -45,12 +45,37 @@ app.config(['$routeProvider',
 	templateUrl: 'configuracion.html',
 	controller: 'configuracion'
       }).
+      when('/consultarProveedor', {
+	templateUrl: 'consultarProveedor.html',
+	controller: 'ConsultarProveedorController'
+      }).
       otherwise({
 	redirectTo: '/autenticacion'
       });
 }]);
 
-
+app.controller('ConsultarProveedorController',['$scope','$http',function($scope,$http){
+        
+        
+        $http.get('services/validarSesion.php?usuario='+g_usuario)
+                .success(
+                    function(data){
+                        console.log('success ' + data);
+                        if(data == 'false'){
+                            location.href='#/autenticacion';} else {
+                            return true;};
+                        });
+                        
+        $scope.consultar = function(ean){
+            //window.alert('hola mundo');
+            // hacer la consulta
+            // mostrar los proveedores en la pantalla
+            $scope.proveedor = 'El proveedor de '+$scope.ean + ' es ';
+            $scope.ean = '';            
+        };
+	
+}]);
+    
 
 
 
@@ -67,9 +92,7 @@ app.controller('principal', function($scope,$http) {
 });
 
 app.service('validarSesion',function($http) {
-   
-    
-    
+      
 });
 
 app.controller('conteo',['$scope','$http',function($scope,$http){
