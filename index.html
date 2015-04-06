@@ -56,13 +56,16 @@
 	</script>
         <script type="text/ng-template" id="conteo.html">
             <div>
-                <form role="form" ng-submit="procesarItem()" onload="document.getElementById('codigo').focus()">
+                <form role="form" id="formaConteo" ng-submit="procesarItem()" onload="document.getElementById('codigo').focus()">
                     <label for="codigo">Ean</label>
                     <input class="form-control col-xd-2" type="text" name="codigo" 
                             id="codigo" 
                             ng-model="codigo" 
                             placeholder="ingrese el codigo o Ean" 
                             onkeydown="if(event.keyCode==13){document.getElementById('cantidad').focus();return false;}">
+                    <span style="color:red" ng-show="codigo.$dirty && codigo.$invalid">
+                        <span ng-show="codigo.$error.required">Ingrese el codigo ...</span>
+                    </span>
                     <label for="Cantidad">Cantidad</label>
                     <input class="form-control col-xd-2" type="text" name="cantidad" 
                             id="cantidad" 
