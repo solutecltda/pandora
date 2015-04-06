@@ -1,4 +1,4 @@
-var app = angular.module('sampleApp', []);
+var app = angular.module('sampleApp', ['app.services']);
 
 var g_usuario = '';
 var g_token = '';
@@ -27,49 +27,70 @@ app.config(['$routeProvider',
       }).
       when('/conteo', {
 	templateUrl: 'conteo.html',
-	controller: 'conteo'
+	controller: 'conteo',
+        resolve : {
+            autorizado : function(bbtServicios){
+                return bbtServicios.autorizado();
+            }
+        }        
       }).
       when('/barrido', {
 	templateUrl: 'barrido.html',
-	controller: 'barrido'
+	controller: 'barrido',
+        resolve : {
+            autorizado : function(bbtServicios){
+                return bbtServicios.autorizado();
+            }
+        }        
       }).
       when('/listado', {
 	templateUrl: 'listado.html',
-	controller: 'listado'        
+	controller: 'listado',
+        resolve : {
+            autorizado : function(bbtServicios){
+                return bbtServicios.autorizado();
+            }
+        }                
       }).
       when('/transmitir', {
 	templateUrl: 'transmitir.html',
-	controller: 'transmitirController'        
+	controller: 'transmitirController',
+        resolve : {
+            autorizado : function(bbtServicios){
+                return bbtServicios.autorizado();
+            }
+        }                
       }).
       when('/configuracion', {
 	templateUrl: 'configuracion.html',
-	controller: 'configuracion'
+	controller: 'configuracion',
+        resolve : {
+            autorizado : function(bbtServicios){
+                return bbtServicios.autorizado();
+            }
+        }                
       }).
       when('/consultarProveedor', {
 	templateUrl: 'consultarProveedor.html',
-	controller: 'ConsultarProveedorController'
+	controller: 'ConsultarProveedorController',
+        resolve : {
+            autorizado : function(bbtServicios){
+                return bbtServicios.autorizado();
+            }
+        }                
       }).
       otherwise({
 	redirectTo: '/autenticacion'
       });
 }]);
 
-app.controller('ConsultarProveedorController',['$scope','$http',function($scope,$http){
+app.controller('ConsultarProveedorController',['$scope','$http','autorizado',function($scope,$http,autorizado){
+
+        console.log('Autorizado = '+autorizado.data );
         
-        
-        $http.get('services/validarSesion.php?usuario='+g_usuario)
-                .success(
-                    function(data){
-                        console.log('success ' + data);
-                        if(data == 'false'){
-                            location.href='#/autenticacion';} else {
-                            return true;};
-                        });
+        if(autorizado.data === 'false'){location.href='#/autenticacion';return false;};
                         
         $scope.consultar = function(ean){
-            //window.alert('hola mundo');
-            // hacer la consulta
-            // mostrar los proveedores en la pantalla
             $scope.proveedor = 'El proveedor de '+$scope.ean + ' es ';
             $scope.ean = '';            
         };
@@ -92,35 +113,58 @@ app.controller('principal', function($scope,$http) {
 
 });
 
+// Este servicio funcionó
 app.factory('validarSesion',function($http) {
-    var validarSesion = {};
-    
-    validarSesion = $http.get('services/validarSesion.php?usuario='+g_usuario);
-    
+    var validarSesion = {};    
+    validarSesion = $http.get('services/validarSesion.php?usuario='+g_usuario);    
     return validarSesion;
-    
-    
 });
+ //
 
-app.controller('conteo',['$scope','$http','validarSesion',function($scope,$http,validarSesion){
+
+
+app.controller('conteo',['$scope','$http','validarSesion','autorizado',function($scope,$http,validarSesion,autorizado){
         
         
-        /* $http.get('services/validarSesion.php?usuario='+g_usuario)
-                .success(
-                    function(data){
-                        console.log('success ' + data);
-                        if(data == 'false'){
-                            location.href='#/autenticacion';} else {
-                            return true;};
-                        }); */
+        console.log('Autorizado = '+autorizado.data );
         
-        validarSesion.success(
-                    function(data){
-                        console.log('success ' + data);
-                        if(data == 'false'){
-                            location.href='#/autenticacion';} else {
-                            return true;};
-                        });
+        if(autorizado.data === 'false'){location.href='#/autenticacion';return false;};
+        
+	$scope.message = 'CONTEO';
+        
+        $scope.conteoInicio = function(){ };
+
+        $scope.contarItems = function(){
+            $http.get('services/contarItems.php').success(function(data){
+                console.log('registros = ',data);
+                $scope.paginas = ( parseInt(data) / $scope.registrosPorPagina)+1;
+                return parseInt(data);
+            } );
+        };
+            
+
+        $scope.procesarItem = function(){
+            if($scope.codigo == null){window.alert('se require el codigo..');return false};
+
+            //if(typeof $scope.cantidad === 'undefined'){$scope.cantidad = 0};
+            $http.get('services/procesarItem.php?codigo='+$scope.codigo+'&cantidad='+$scope.cantidad+'&cara='+g_cara+'&gondola='+g_gondola)
+                  .success(function(data){
+                     console.log('se grabo registro con exito');
+                     console.log(data);
+                     $scope.numRecs = parseInt(data);
+                  } );
+            $scope.codigo = '';            
+            
+        };    
+	
+}]);
+
+app.controller('barrido',['$scope','$http','autorizado',function($scope,$http,autorizado){
+        
+        
+        console.log('Autorizado = '+autorizado.data );
+        
+        if(autorizado.data === 'false'){location.href='#/autenticacion';return false;};
 	
         
 	$scope.message = 'CONTEO';
@@ -152,59 +196,12 @@ app.controller('conteo',['$scope','$http','validarSesion',function($scope,$http,
 	
 }]);
 
-app.controller('barrido',['$scope','$http',function($scope,$http){
-        
-        
-        $http.get('services/validarSesion.php?usuario='+g_usuario)
-                .success(
-                    function(data){
-                        console.log('success ' + data);
-                        if(data == 'false'){
-                            location.href='#/autenticacion';} else {
-                            return true;};
-                        });
-	
-        
-	$scope.message = 'CONTEO';
-        
-        $scope.conteoInicio = function(){ };
 
-        $scope.contarItems = function(){
-            $http.get('services/contarItems.php').success(function(data){
-                console.log('registros = ',data);
-                $scope.paginas = ( parseInt(data) / $scope.registrosPorPagina)+1;
-                return parseInt(data);
-            } );
-        };
-            
-
-        $scope.procesarItem = function(){
-            if($scope.codigo == null){window.alert('se require el codigo..');return false};
-
-            //if(typeof $scope.cantidad === 'undefined'){$scope.cantidad = 0};
-            $http.get('services/procesarItem.php?codigo='+$scope.codigo+'&cantidad='+$scope.cantidad+'&cara='+g_cara+'&gondola='+g_gondola)
-                  .success(function(data){
-                     console.log('se grabo registro con exito');
-                     console.log(data);
-                     $scope.numRecs = parseInt(data);
-                  } );
-            $scope.codigo = '';            
-            
-        };    
-	
-}]);
-
-
-app.controller('listado',['$scope','$http', function($scope,$http){	
+app.controller('listado',['$scope','$http','autorizado', function($scope,$http,autorizado){	
     
-        $http.get('services/validarSesion.php?usuario='+g_usuario)
-                .success(
-                    function(data){
-                        console.log('success ' + data);
-                        if(data == 'false'){
-                            location.href='#/autenticacion';} else {
-                            return true;};
-                        });
+        console.log('Autorizado = '+autorizado.data );
+        
+        if(autorizado.data === 'false'){location.href='#/autenticacion';return false;};
 
     	
         $scope.message = 'Descargando datos ...';
@@ -241,24 +238,13 @@ app.controller('listado',['$scope','$http', function($scope,$http){
 }] );
 
 
-app.controller('configuracion', function($scope,$http) {
+app.controller('configuracion',['$scope','$http','autorizado',function($scope,$http,autorizado) {
 
-    $http.get('services/validarUsuario.php?usuario='+g_usuario).
-            success( 
-            function(data){
-                console.log(data.usuario);
+        console.log('Autorizado = '+autorizado.data );
         
-    });
+        if(autorizado.data === 'false'){location.href='#/autenticacion';return false;};
     
     
-    $http.get('services/validarSesion.php?usuario='+g_usuario)
-                .success(
-                    function(data){
-                        console.log('success ' + data);
-                        if(data == 'false'){
-                            location.href='#/autenticacion';} else {
-                            return true;};
-                        });
 
 	$scope.message = 'CONFIGURACION';
         $scope.cara    = g_cara;
@@ -281,7 +267,7 @@ app.controller('configuracion', function($scope,$http) {
             
         };
 
-});
+}]);
 
 app.controller('LoginController', function ($scope, $http) {
   
@@ -314,16 +300,11 @@ app.controller('LoginController', function ($scope, $http) {
   
 });
 
-app.controller('transmitirController', function($scope,$http) {
+app.controller('transmitirController','autorizado', function($scope,$http,autorizado) {
 
-        $http.get('services/validarSesion.php?usuario='+g_usuario)
-                        .success(
-                            function(data){
-                                console.log('success ' + data);
-                                if(data == 'false'){
-                                    location.href='#/autenticacion';} else {
-                                    return true;};
-                                });
+        console.log('Autorizado = '+autorizado.data );
+        
+        if(autorizado.data === 'false'){location.href='#/autenticacion';return false;};
 
 
         $scope.nombreTipoinv = g_nombreTipoinv;
