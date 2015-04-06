@@ -82,6 +82,7 @@ app.controller('ConsultarProveedorController',['$scope','$http',function($scope,
 app.controller('principal', function($scope,$http) {
 
         $scope.nombreTipoinv = g_nombreTipoinv;
+        
         $scope.cerrarSesion = function(){
             $http.get('services/cerrarSesion.php?usuario='+g_usuario).success(function(data){
                console.log('session de usuario '+g_usuario+' cerrada con exito '); 
@@ -91,15 +92,29 @@ app.controller('principal', function($scope,$http) {
 
 });
 
-app.service('validarSesion',function($http) {
-      
+app.factory('validarSesion',function($http) {
+    var validarSesion = {};
+    
+    validarSesion = $http.get('services/validarSesion.php?usuario='+g_usuario);
+    
+    return validarSesion;
+    
+    
 });
 
-app.controller('conteo',['$scope','$http',function($scope,$http){
+app.controller('conteo',['$scope','$http','validarSesion',function($scope,$http,validarSesion){
         
         
-        $http.get('services/validarSesion.php?usuario='+g_usuario)
+        /* $http.get('services/validarSesion.php?usuario='+g_usuario)
                 .success(
+                    function(data){
+                        console.log('success ' + data);
+                        if(data == 'false'){
+                            location.href='#/autenticacion';} else {
+                            return true;};
+                        }); */
+        
+        validarSesion.success(
                     function(data){
                         console.log('success ' + data);
                         if(data == 'false'){
