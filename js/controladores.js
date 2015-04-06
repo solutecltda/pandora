@@ -54,16 +54,15 @@ app.controller('conteo',['$scope','$http','validarSesion','autorizado',function(
             
 
         $scope.procesarItem = function(){
-            if($scope.codigo === null || $scope.codigo === ''){window.alert('se require el codigo..');return false};
+            if($scope.codigo === null || $scope.codigo === '' || angular.isUndefined($scope.codigo) ){window.alert('se require el codigo..');return false};
+            if($scope.cantidad === null || $scope.cantidad === '' || angular.isUndefined($scope.cantidad) ){window.alert('se require la cantidad..');return false};
 
-            //if(typeof $scope.cantidad === 'undefined'){$scope.cantidad = 0};
             $http.get('services/procesarItem.php?codigo='+$scope.codigo+'&cantidad='+$scope.cantidad+'&cara='+g_cara+'&gondola='+g_gondola)
                   .success(function(data){
                      console.log('se grabo registro con exito');
                      console.log(data);
                      $scope.numRecs = parseInt(data);
                      $scope.codigo = '';
-                     location.href='#/conteo';
                   } );
                         
             
