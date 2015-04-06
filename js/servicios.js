@@ -21,3 +21,10 @@ app.factory('bbtServicios', ['$http', function($http) {
     };
     return sdo;
 }]);
+
+// Este servicio funcionó
+app.factory('validarSesion',function($http) {
+    var validarSesion = {};    
+    validarSesion = $http.get('services/validarSesion.php?usuario='+g_usuario);    
+    return validarSesion;
+});
